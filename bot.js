@@ -217,7 +217,7 @@ async function logSwap(interaction, report) {
       value: `${interaction.user.username}\n\`${interaction.user.id}\``,
     });
   try {
-    await fetch(url, {
+    const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -227,6 +227,9 @@ async function logSwap(interaction, report) {
       }),
       signal: AbortSignal.timeout(8000),
     });
+    if (!response.ok) {
+      console.error(`Swap log was refused (${response.status}). Create a new webhook and put it in discord.json.`);
+    }
   } catch (error) {
     console.error(error.message || "Could not send the swap log.");
   }

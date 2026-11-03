@@ -505,7 +505,18 @@ function createPump(socket) {
 
 function isTakenResult(result) {
   const text = `${result?.code || ""} ${result?.message || ""}`.toLowerCase();
-  return result?.status === 409 || text.includes("duplicate") || text.includes("already") || text.includes("in use");
+  return result?.status === 409
+    || text.includes("duplicate")
+    || text.includes("already")
+    || text.includes("in use")
+    || text.includes("not available")
+    || text.includes("not_available");
+}
+
+function stopsTheClaim(result) {
+  const status = result?.status || 0;
+  if (status === 429 || status === 0 || status >= 500) return false;
+  return !isTakenResult(result);
 }
 
 function friendlyRule(message) {
@@ -1190,7 +1201,7 @@ export class EpicClient {
         if (!winner || result.doneAt < winner.doneAt) winner = { result: shaped, doneAt: result.doneAt };
         return;
       }
-      if (result.status !== 429 && !isTakenResult(result)) fatal = result;
+      if (stopsTheClaim(result)) fatal = result;
     };
     const shoot = (pump) => {
       if (!pump || pump.inflight >= 3) return;
@@ -1330,7 +1341,7 @@ export class EpicClient {
         if (!kept || result.doneAt < kept.doneAt) kept = { result: shaped, doneAt: result.doneAt };
         return;
       }
-      if (result.status !== 429 && !isTakenResult(result)) fatalKeeper = result;
+      if (stopsTheClaim(result)) fatalKeeper = result;
     };
     const shootKeeper = (pump) => {
       if (!pump || pump.inflight >= 3) return;
@@ -1359,7 +1370,7 @@ export class EpicClient {
         startKeeper();
         return;
       }
-      if (result.status !== 429 && !isTakenResult(result)) fatalMiddle = result;
+      if (stopsTheClaim(result)) fatalMiddle = result;
     };
     const shootMiddle = (pump) => {
       if (!pump || pump.inflight >= 3) return;
