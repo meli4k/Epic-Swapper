@@ -1,0 +1,46 @@
+{
+  "name": "epic-swapper-gui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Desktop window for swapping Epic display names",
+  "author": "Epic Swapper",
+  "main": "electron/main.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "pregui": "node scripts/copy-epic.js",
+    "gui": "electron .",
+    "preexe": "node scripts/copy-epic.js",
+    "exe": "electron-builder --win portable"
+  },
+  "build": {
+    "appId": "local.epic-swapper",
+    "productName": "Epic Swapper",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "public/**/*",
+      "src/epic.js",
+      "src/service.js",
+      "package.json",
+      "!**/node_modules/**"
+    ],
+    "asar": true,
+    "npmRebuild": false,
+    "win": {
+      "target": "portable",
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "Epic Swapper.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^45.2.1",
+    "electron-builder": "^26.18.0"
+  }
+}

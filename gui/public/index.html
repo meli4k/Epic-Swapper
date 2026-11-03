@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Epic Swapper</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="booting">
+  <div id="intro" class="intro" aria-hidden="true">
+    <div class="intro-stage">
+      <div class="intro-logo">
+        <span class="intro-glow"></span>
+        <span class="intro-pulse"></span>
+        <span class="intro-pulse late"></span>
+        <svg class="intro-mark" viewBox="0 0 32 32">
+          <defs>
+            <linearGradient id="intro-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ffffff"/>
+              <stop offset="1" stop-color="#6f737c"/>
+            </linearGradient>
+          </defs>
+          <path pathLength="1" d="M6.5 14a10 10 0 0 1 17.2-6"/>
+          <path pathLength="1" d="M24.5 3.5v5h-5"/>
+          <path pathLength="1" d="M25.5 18a10 10 0 0 1-17.2 6"/>
+          <path pathLength="1" d="M7.5 28.5v-5h5"/>
+        </svg>
+      </div>
+      <div id="intro-word" class="intro-word"></div>
+      <div class="intro-bar"></div>
+      <div class="intro-caption">Swap · Lookup · Account</div>
+    </div>
+  </div>
+
+  <div class="aura aura-a" aria-hidden="true"></div>
+  <div class="aura aura-b" aria-hidden="true"></div>
+  <div class="grid" aria-hidden="true"></div>
+  <div class="grid-lit" aria-hidden="true"></div>
+  <div class="spotlight" aria-hidden="true"></div>
+
+  <header class="titlebar">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+        <defs>
+          <linearGradient id="mark-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset="1" stop-color="#6f737c"/>
+          </linearGradient>
+        </defs>
+        <path d="M6.5 14a10 10 0 0 1 17.2-6" fill="none" stroke="url(#mark-grad)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M24.5 3.5v5h-5" fill="none" stroke="url(#mark-grad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M25.5 18a10 10 0 0 1-17.2 6" fill="none" stroke="url(#mark-grad)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M7.5 28.5v-5h5" fill="none" stroke="url(#mark-grad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="brand-name">Epic Swapper</span>
+    </div>
+    <button id="status" class="status" type="button">
+      <span class="status-dot"></span>
+      <span id="status-text">No lookup account</span>
+    </button>
+  </header>
+
+  <div class="shell">
+    <aside class="rail">
+      <div id="rail-indicator" class="rail-indicator" aria-hidden="true"></div>
+      <button type="button" class="rail-btn active" data-view="swap">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
+        <span>Swap</span>
+      </button>
+      <button type="button" class="rail-btn" data-view="lookup">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+        <span>Lookup</span>
+      </button>
+      <button type="button" class="rail-btn" data-view="account">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg>
+        <span>Account</span>
+      </button>
+    </aside>
+    <main id="panel" class="panel"></main>
+  </div>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+  <div id="cursor-ring" class="cursor-ring" aria-hidden="true"></div>
+  <div id="cursor-dot" class="cursor-dot" aria-hidden="true"></div>
+  <p id="offline" class="offline" hidden>This window lost contact with the app. Close it and open Epic Swapper.exe again.</p>
+  <script src="app.js"></script>
+</body>
+</html>

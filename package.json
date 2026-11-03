@@ -1,0 +1,18 @@
+{
+  "name": "epic-swapper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Discord bot that swaps Epic display names between two accounts you sign in to",
+  "author": "Epic Swapper",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node bot.js",
+    "login": "node login.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.28.0"
+  }
+}

@@ -1,0 +1,8 @@
+node_modules/
+discord.json
+data/session.json
+data/session.json.tmp
+gui/node_modules/
+gui/release/
+gui/src/epic.js
+gui/Epic Swapper.exe
