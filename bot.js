@@ -6,6 +6,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   Client,
+  AttachmentBuilder,
   EmbedBuilder,
   Events,
   GatewayIntentBits,
@@ -19,6 +20,7 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { EpicClient } from "./src/epic.js";
+import { renderLocker } from "./src/locker.js";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const DISCORD_CONFIG = join(ROOT, "discord.json");
@@ -816,6 +818,56 @@ async function submitCaps(interaction) {
   armTimer(job, userId, interaction);
 }
 
+async function beginLocker(interaction) {
+  const userId = interaction.user.id;
+  if (jobs.has(userId)) {
+    await interaction.reply({
+      ...quiet,
+      flags: MessageFlags.Ephemeral,
+      content: "You already have a request in progress. Cancel that one first.",
+    });
+    return;
+  }
+  const job = { phase: "source", mode: "locker", cancel: false, source: freshClient(), target: null, timer: null, interaction };
+  jobs.set(userId, job);
+  try {
+    await interaction.deferReply({ ...quiet, flags: MessageFlags.Ephemeral });
+    const name = await signIn(
+      interaction,
+      job,
+      job.source,
+      "Sign in to the Epic account whose Fortnite locker you want to see."
+    );
+    if (!name) throw new Error("Epic did not return a display name for that account.");
+    await show(interaction, { content: `Reading the locker for **${name}**...`, embeds: [], components: [] });
+    const profile = await job.source.queryAthena();
+    const sheets = await renderLocker(profile, job.source.displayName() || name);
+    if (!sheets.length) {
+      await show(interaction, {
+        content: `**${name}** has no Fortnite cosmetics on this account.`,
+        embeds: [],
+        components: [],
+      });
+      return;
+    }
+    await show(interaction, {
+      content: `Locker for **${name}**.`,
+      embeds: [],
+      components: [],
+      files: sheets.map((sheet) => new AttachmentBuilder(sheet.file, { name: sheet.name })),
+    });
+  } catch (error) {
+    if (jobs.get(userId) !== job) return;
+    await show(interaction, {
+      content: error?.message === "Sign-in cancelled." ? "Cancelled." : (error?.message || "The locker could not be read."),
+      embeds: [],
+      components: [],
+    });
+  } finally {
+    if (jobs.get(userId) === job) jobs.delete(userId);
+  }
+}
+
 async function startSwap(interaction) {
   const userId = interaction.user.id;
   if (jobs.has(userId)) {
@@ -865,6 +917,8 @@ function helpEmbed() {
       "4. Check the order. Target goes to the second account, then that account's name goes to the third.",
       "5. A second confirmation shows the process. It says to use this at your own risk, and that lost names are not our responsibility. Press I want to double swap only if you want to do this, or cancel.",
       "The first account changes to a random name, the second account takes that name, and the third account takes the name the second account just released. The third account's previous name is replaced.",
+      "",
+      "**`/locker`** signs in to one account and draws its Fortnite locker. Skins, back blings, pickaxes, gliders, emotes, and the other cosmetic types are separate pictures.",
       "",
       "**Change caps**",
       "1. Sign in to the account whose capitalization you want to change.",
@@ -990,6 +1044,9 @@ const commands = [
     .setName("help")
     .setDescription("How this bot works"),
   new SlashCommandBuilder()
+    .setName("locker")
+    .setDescription("Draw the Fortnite locker for an account you sign in to"),
+  new SlashCommandBuilder()
     .setName("epic")
     .setDescription("Show the Epic profile for a display name or account id")
     .addStringOption((option) => option
@@ -1037,6 +1094,7 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.isChatInputCommand()) {
       if (interaction.commandName === "start") await startSwap(interaction);
       else if (interaction.commandName === "help") await interaction.reply({ ...quiet, flags: MessageFlags.Ephemeral, embeds: [helpEmbed()] });
+      else if (interaction.commandName === "locker") await beginLocker(interaction);
       else if (interaction.commandName === "epic") await lookupName(interaction);
       return;
     }

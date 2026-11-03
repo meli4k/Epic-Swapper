@@ -1023,6 +1023,30 @@ export class EpicClient {
     return this.gameAccess;
   }
 
+  async queryAthena() {
+    const accountId = this.accountId();
+    if (!accountId) throw new Error("That Epic sign-in is missing an account id.");
+    const token = await this.gameAccessToken();
+    const response = await epicFetch(
+      `${FORTNITE}/fortnite/api/game/v2/profile/${encodeURIComponent(accountId)}/client/QueryProfile?profileId=athena&rvn=-1`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `bearer ${token}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "User-Agent": UA,
+        },
+        body: "{}",
+      }
+    );
+    const payload = await readJson(response);
+    if (!response.ok) {
+      throw new Error(clean(payload.errorMessage || payload.message) || "Epic did not return this account's locker.");
+    }
+    return payload;
+  }
+
   async readEpic(url, token) {
     try {
       const response = await epicFetch(url, {
